@@ -1,0 +1,25 @@
+import {test,expect} from "@playwright/test"
+import path from "path"
+test ("FileUpload",async({page})=>{
+    await page.goto("https://login.salesforce.com/")
+    await page.getByRole("textbox",{name: "Username"}).first().fill("dilipkumar.rajendran@testleaf.com")
+    await page.getByRole("textbox",{name: "Password"}).fill('TestLeaf@2025')
+    await page.getByRole("button",{name: "Log In"}).click()
+    await page.getByRole("button",{name: "App Launcher"}).click()
+    await page.locator(`//button[text()="View All"]`).click()
+    await page.getByPlaceholder(`Search apps or items...`).first().fill("Accounts")
+    await page.locator('//mark[text()="Accounts"]').click()
+    await page.locator('//div[text()="New"]').click()
+    await page.getByRole('textbox',{name: "Account Name"}).fill("RamiSha")
+    await page.getByRole("combobox",{name: "Type"}).click()
+    await page.locator(`[title="Prospect"]`).click()
+    await page.getByRole("combobox",{name: "Industry"}).click()
+    await page.locator(`[title="Banking"]`).click()
+    await page.locator(`[name="SaveEdit"]`).click()
+    expect(page.locator(`[slot="primaryField"]`)).toHaveText("RamiSha")
+    const upload = page.waitForEvent("filechooser")
+    await page.locator(`//span[@part="button"]`).click()
+    const fileUpload = await upload
+    await fileUpload.setFiles(path.join(__dirname,"../../Data/Lead.png"))
+    await page.locator(`//span[text()="Done"]`).click()
+})
